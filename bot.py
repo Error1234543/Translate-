@@ -6,8 +6,10 @@ from utils.pdf_extract import extract_text
 from utils.pdf_create import create_pdf
 
 # Environment variables
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")  # Gemini API key
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")  # Telegram Bot token
+GEMINI_API_KEY = ("
+AIzaSyB5TA6nDIj8VARsC4LPfdxu7_HBnetmPg8")  # Gemini API key
+TELEGRAM_TOKEN = ("
+8352571102:AAG42zR8kVXnoqi6C8G70Ud-hEPoTlUKjAk")  # Telegram Bot token
 
 if not GEMINI_API_KEY or not TELEGRAM_TOKEN:
     raise ValueError("ERROR: Please set GEMINI_API_KEY and TELEGRAM_TOKEN in environment variables!")
