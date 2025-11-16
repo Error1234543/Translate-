@@ -1,18 +1,20 @@
 import os
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, MessageHandler, filters, CallbackContext
+from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, ContextTypes
 from utils.pdf_extract import extract_text
 from utils.pdf_create import create_pdf
 import openai   # Gemini AI API compatible
 
-OPENAI_API_KEY = "YOUR_GEMINI_API_KEY"
-TELEGRAM_TOKEN = "YOUR_BOT_TOKEN"
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
 
 # Initialize OpenAI
 openai.api_key = OPENAI_API_KEY
 
-def start(update: Update, context: CallbackContext):
-    update.message.reply_text("Hello! Send me your English PDF test paper and I will translate it to Gujarati without watermark.")
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "Hello! Send me your English PDF test paper and I will translate it to Gujarati without watermark."
+    )
 
 def translate_text(text):
     prompt = f"Translate the following English text **word-to-word** into Gujarati:\n\n{text}"
@@ -22,9 +24,9 @@ def translate_text(text):
     )
     return response['choices'][0]['message']['content']
 
-def handle_pdf(update: Update, context: CallbackContext):
-    file = update.message.document.get_file()
-    file.download("input.pdf")
+async def handle_pdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    file = await update.message.document.get_file()
+    await file.download_to_drive("input.pdf")
 
     # Extract PDF text
     text = extract_text("input.pdf")
@@ -36,17 +38,16 @@ def handle_pdf(update: Update, context: CallbackContext):
     create_pdf(translated_text, "translated.pdf")
 
     # Send PDF back to user
-    update.message.reply_document(document=open("translated.pdf", "rb"))
+    await update.message.reply_document(document=open("translated.pdf", "rb"))
 
 def main():
-    updater = Updater(TELEGRAM_TOKEN)
-    dp = updater.dispatcher
+    app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(filters.Document.FileExtension("pdf"), handle_pdf))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.Document.FileExtension("pdf"), handle_pdf))
 
-    updater.start_polling()
-    updater.idle()
+    print("Bot is running...")
+    app.run_polling()
 
 if __name__ == "__main__":
     main()
