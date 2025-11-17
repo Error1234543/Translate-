@@ -1,5 +1,6 @@
-pyTelegramBotAPI==4.13.0
-googletrans==4.0.0-rc1
-PyMuPDF==1.22.5
-fpdf==1.7.2
-httpx>=0.24.0
+pyTelegramBotAPI
+googletrans
+PyMuPDF
+fpdf
+httpx
+requests
